@@ -36,6 +36,13 @@ var verticalSpeed = 0;
 var horizontalSpeed = 0;
 var speed = 0;
 
+const players = {
+    HUMAN: 'human',
+    PRACTICE: 'practice',
+    EVIL: 'evil'
+}
+var player2 = players.PRACTICE;
+
 var wPressed = false;
 var sPressed = false;
 var upPressed = false;
@@ -50,6 +57,8 @@ function setInitialConditions() {
 	ballLeft = ((tableWidth + ballWidth) / 2);
 
 	// Set the speeds
+	//verticalSpeed = 0;
+	//horizontalSpeed = 2;
 	verticalSpeed = 2 * Math.random() - 1;
 	horizontalSpeed = 2 * Math.random() - 1;
 	if (horizontalSpeed < 0) {
@@ -235,13 +244,41 @@ function generateNextFrame() {
 		paddle1.style.top = paddle1Top + 'px';
 	}
 
-	if (upPressed) {
-		paddle2Top = Math.max(paddle2Top - 5, 50);
+	if (player2 === players.HUMAN) {
+		if (upPressed) {
+			paddle2Top = Math.max(paddle2Top - 5, 50);
+			paddle2.style.top = paddle2Top + 'px';
+		}
+	
+		if (downPressed) {
+			paddle2Top = Math.min(paddle2Top + 5, tableHeight - paddle2Height - 50);
+			paddle2.style.top = paddle2Top + 'px';
+		}
+	}
+	else if (player2 === players.PRACTICE) {
+		paddle2Top = Math.min(Math.max((ballTop + ballHeight / 2) - paddle2Height / 2, 50), tableHeight - paddle2Height - 50);
 		paddle2.style.top = paddle2Top + 'px';
 	}
+	else if (player2 === players.EVIL) {
+		var topGoalTop = ballHeight / 2;
+		var bottomGoalTop = tableHeight - (ballHeight / 2);
+		var goalRight = paddle1Left + paddle1Width;
+		var ballMiddle = ballTop + ballHeight;
 
-	if (downPressed) {
-		paddle2Top = Math.min(paddle2Top + 5, tableHeight - paddle2Height - 50);
+		// Ratio to hit the top goal
+		var topGoalRatio = Math.abs(horizontalSpeed) * (topGoalTop - ballMiddle) / (paddle2Left - (ballWidth / 2) - goalRight);
+		// Ratio to hit the bottom goal
+		var bottomGoalRatio = Math.abs(horizontalSpeed) * (bottomGoalTop - ballMiddle) / (paddle2Left - (ballWidth / 2) - goalRight);
+
+		// Take whichever shot is easiest
+		if (Math.abs(topGoalRatio) < Math.abs(bottomGoalRatio)) {
+			paddle2Top = (ballTop + (ballHeight / 2)) - ((paddle2Height * (topGoalRatio + 1)) / 2);
+		}
+		else {
+			paddle2Top = (ballTop + (ballHeight / 2)) - ((paddle2Height * (bottomGoalRatio + 1)) / 2);
+		}
+
+		paddle2Top = Math.min(Math.max(paddle2Top, 50), tableHeight - paddle2Height - 50);
 		paddle2.style.top = paddle2Top + 'px';
 	}
 }
