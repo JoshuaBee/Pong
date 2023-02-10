@@ -23,7 +23,6 @@ body {
 	z-index: 4;
 	width: 100vw;
 	height: 100vh;
-	font-size: 16em;
 	background-color: #000;
 	opacity: 1;
 	transition: opacity 2s;
@@ -34,6 +33,7 @@ body {
 }
 
 #title {
+	font-size: 8em;
 	position: absolute;
 	z-index: 5;
 	top: 50%;
@@ -67,8 +67,8 @@ body {
 #ball {
 	position: absolute;
 	z-index: 3;
-	width: 1em;
-	height: 1em;
+	width: 1vw;
+	height: 1vw;
 	top: calc(50vh - 0.5em);
 	left: calc(50vw - 0.5em);
 	background-color: #FFF;
@@ -116,4 +116,22 @@ body {
 	left: 50%;
 	transform: translate(-50%, -50%);
 	font-size: 8em;
+}
+
+#error {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	opacity: 1;
+	z-index: 19;
+}
+
+#error.hidden {
+	opacity: 0;
+}
+
+#error p {
+	font-size: 1.5em;
+	text-align: center;
 }

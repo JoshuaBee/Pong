@@ -7,6 +7,7 @@ var paddle2 = document.getElementById('paddle2');
 var player1ScoreElement = document.getElementById('player1Score');
 var player2ScoreElement = document.getElementById('player2Score');
 var countdownElement = document.getElementById('countdown');
+var errorElement = document.getElementById('error');
 
 // Get the table dimensions.
 var tableHeight = parseInt(window.getComputedStyle(table).height, 10);
@@ -49,16 +50,12 @@ var upPressed = false;
 var downPressed = false;
 
 var frame;
-var frames = 300;
-
 function setInitialConditions() {
 	// Set ball position
 	ballTop = ((tableHeight + ballHeight) / 2);
 	ballLeft = ((tableWidth + ballWidth) / 2);
 
 	// Set the speeds
-	//verticalSpeed = 0;
-	//horizontalSpeed = 2;
 	verticalSpeed = 2 * Math.random() - 1;
 	horizontalSpeed = 2 * Math.random() - 1;
 	if (horizontalSpeed < 0) {
@@ -69,7 +66,7 @@ function setInitialConditions() {
 	}
 	normalizeSpeeds();
 	
-	speed = 2;
+	speed = Math.ceil(tableWidth / 256);
 }
 
 function normalizeSpeeds() {
@@ -122,7 +119,28 @@ document.addEventListener('keyup', function(event){
 	}
 });
 
+const portrait = window.matchMedia("(orientation: portrait)");
+portrait.addEventListener("change", function(e) {
+    start();
+})
+
+window.addEventListener('resize', () => {
+	start();
+}, { passive: true });
+
 document.addEventListener('DOMContentLoaded', function(event){
+	start();
+});
+
+function start() {
+
+	// Check if the device is portrait or landscape.
+	if (portrait.matches) {
+		window.cancelAnimationFrame(frame);
+		errorElement.classList.remove('hidden');
+		return;
+	}
+	errorElement.classList.add('hidden');
 
 	title.classList.add('visible');
 
@@ -145,17 +163,15 @@ document.addEventListener('DOMContentLoaded', function(event){
 					countdownElement.style.zIndex = -1;
 
 					// Start the game
-					frame = setInterval(generateNextFrame, 1000 / frames);
+					frame = window.requestAnimationFrame(generateNextFrame);
 				}
 				else {
 					countdownElement.innerHTML = countdown;
 				}
 			}, 1000);
 		}, 2000);
-	  
-	  }, 2500);
-
-});
+	}, 2500);
+}
 
 function generateNextFrame() {
 	var newBallTop = ballTop + (verticalSpeed * speed);
@@ -185,14 +201,11 @@ function generateNextFrame() {
 	// Bounces off the top or bottom of the paddle
 	if (isNewBallHittingPaddle1Top || isNewBallHittingPaddle1Bottom || isNewBallHittingPaddle2Top || isNewBallHittingPaddle2Bottom) {
 		verticalSpeed *= -1.0;
-		speed += 0.5;
+		speed += Math.ceil(tableWidth / 1024);
 	}
 
 	// Goal scored
 	if (newBallLeft < 0 || newBallRight > tableWidth) {
-		// Stop the game
-		clearInterval(frame);
-
 		// Increment the scores
 		if (newBallLeft < 0) {
 			player2Score++;
@@ -204,7 +217,8 @@ function generateNextFrame() {
 		}
 
 		setInitialConditions();
-		frame = setInterval(generateNextFrame, 1000 / frames);
+		frame = window.requestAnimationFrame(generateNextFrame);
+		return;
 	}
 
 	// Bounces off the left or right paddle
@@ -220,7 +234,7 @@ function generateNextFrame() {
 		}
 
 		horizontalSpeed *= -1.0;
-		speed += 0.5;
+		speed += Math.ceil(tableWidth / 1024);
 
 		normalizeSpeeds();
 	}
@@ -235,23 +249,23 @@ function generateNextFrame() {
 
 	// Move the paddles
 	if (wPressed) {
-		paddle1Top = Math.max(paddle1Top - 5, 50);
+		paddle1Top = Math.max(paddle1Top - Math.ceil(tableWidth / 64), 50);
 		paddle1.style.top = paddle1Top + 'px';
 	}
 
 	if (sPressed) {
-		paddle1Top = Math.min(paddle1Top + 5, tableHeight - paddle1Height - 50);
+		paddle1Top = Math.min(paddle1Top + Math.ceil(tableWidth / 64), tableHeight - paddle1Height - 50);
 		paddle1.style.top = paddle1Top + 'px';
 	}
 
 	if (player2 === players.HUMAN) {
 		if (upPressed) {
-			paddle2Top = Math.max(paddle2Top - 5, 50);
+			paddle2Top = Math.max(paddle2Top - Math.ceil(tableWidth / 64), 50);
 			paddle2.style.top = paddle2Top + 'px';
 		}
 	
 		if (downPressed) {
-			paddle2Top = Math.min(paddle2Top + 5, tableHeight - paddle2Height - 50);
+			paddle2Top = Math.min(paddle2Top + Math.ceil(tableWidth / 64), tableHeight - paddle2Height - 50);
 			paddle2.style.top = paddle2Top + 'px';
 		}
 	}
@@ -281,4 +295,6 @@ function generateNextFrame() {
 		paddle2Top = Math.min(Math.max(paddle2Top, 50), tableHeight - paddle2Height - 50);
 		paddle2.style.top = paddle2Top + 'px';
 	}
+
+	frame = window.requestAnimationFrame(generateNextFrame);
 }
