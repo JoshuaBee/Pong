@@ -10,25 +10,25 @@ var countdownElement = document.getElementById('countdown');
 var errorElement = document.getElementById('error');
 
 // Get the table dimensions.
-var tableHeight = parseInt(window.getComputedStyle(table).height, 10);
-var tableWidth = parseInt(window.getComputedStyle(table).width, 10);
+var tableHeight;
+var tableWidth;
 
 // Get the paddles current position.
-var paddle1Top = parseInt(window.getComputedStyle(paddle1).top, 10);
-var paddle1Left = parseInt(window.getComputedStyle(paddle1).left, 10);
-var paddle1Height = parseInt(window.getComputedStyle(paddle1).height, 10);
-var paddle1Width = parseInt(window.getComputedStyle(paddle1).width, 10);
+var paddle1Top;
+var paddle1Left;
+var paddle1Height;
+var paddle1Width;
 
-var paddle2Top = parseInt(window.getComputedStyle(paddle2).top, 10);
-var paddle2Left = parseInt(window.getComputedStyle(paddle2).left, 10);
-var paddle2Height = parseInt(window.getComputedStyle(paddle2).height, 10);
-var paddle2Width = parseInt(window.getComputedStyle(paddle2).width, 10);
+var paddle2Top;
+var paddle2Left;
+var paddle2Height;
+var paddle2Width;
 
 // Get the balls current position.
-var ballTop = parseInt(window.getComputedStyle(ball).top, 10);
-var ballHeight = parseInt(window.getComputedStyle(ball).height, 10);
-var ballLeft = parseInt(window.getComputedStyle(ball).left, 10);
-var ballWidth = parseInt(window.getComputedStyle(ball).width, 10);
+var ballTop;
+var ballHeight;
+var ballLeft;
+var ballWidth;
 
 // Set inital conditions
 var player1Score = 0;
@@ -37,7 +37,7 @@ var verticalSpeed = 0;
 var horizontalSpeed = 0;
 var speed = 0;
 
-const players = {
+var players = {
     HUMAN: 'human',
     PRACTICE: 'practice',
     EVIL: 'evil'
@@ -50,6 +50,30 @@ var upPressed = false;
 var downPressed = false;
 
 var frame;
+
+function getInitialPositions() {
+	// Get the table dimensions.
+	tableHeight = parseInt(window.getComputedStyle(table).height, 10);
+	tableWidth = parseInt(window.getComputedStyle(table).width, 10);
+
+	// Get the paddles current position.
+	paddle1Top = parseInt(window.getComputedStyle(paddle1).top, 10);
+	paddle1Left = parseInt(window.getComputedStyle(paddle1).left, 10);
+	paddle1Height = parseInt(window.getComputedStyle(paddle1).height, 10);
+	paddle1Width = parseInt(window.getComputedStyle(paddle1).width, 10);
+
+	paddle2Top = parseInt(window.getComputedStyle(paddle2).top, 10);
+	paddle2Left = parseInt(window.getComputedStyle(paddle2).left, 10);
+	paddle2Height = parseInt(window.getComputedStyle(paddle2).height, 10);
+	paddle2Width = parseInt(window.getComputedStyle(paddle2).width, 10);
+
+	// Get the balls current position.
+	ballTop = parseInt(window.getComputedStyle(ball).top, 10);
+	ballHeight = parseInt(window.getComputedStyle(ball).height, 10);
+	ballLeft = parseInt(window.getComputedStyle(ball).left, 10);
+	ballWidth = parseInt(window.getComputedStyle(ball).width, 10);
+}
+
 function setInitialConditions() {
 	// Set ball position
 	ballTop = ((tableHeight + ballHeight) / 2);
@@ -119,7 +143,7 @@ document.addEventListener('keyup', function(event){
 	}
 });
 
-const portrait = window.matchMedia("(orientation: portrait)");
+var portrait = window.matchMedia("(orientation: portrait)");
 portrait.addEventListener("change", function(e) {
     start();
 })
@@ -144,6 +168,7 @@ function start() {
 
 	title.classList.add('visible');
 
+	getInitialPositions();
 	setInitialConditions();
 
 	setTimeout(function (){
